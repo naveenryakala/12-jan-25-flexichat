@@ -1,0 +1,116 @@
+# AI-Based Multi-Channel Chatbot Platform with Admin Panel and Role-Based Access
+
+## Project Title
+
+AI-Based Multi-Channel Chatbot Platform using Groq LLM
+
+## Description
+
+This project is a **multi-channel AI chatbot platform** (Telegram, WhatsApp, Web) powered by Groq LLM. It features:
+
+- Role-based access (Admin, Manager, User)
+- Admin panel for managing clients and users
+- JWT-based authentication and session management
+- Secure login and logout flows
+- Client-specific configurations
+
+## Features
+
+- Multi-channel chatbot support
+- AI-powered responses via Groq LLM
+- Admin panel with client and user management
+- Role-based access control
+- JWT authentication and session management
+- Secure login, logout, and control flows
+
+## Technology Stack
+
+- Node.js, Express.js
+- MongoDB
+- JWT
+- Telegram Bot API, WhatsApp Cloud API, Web chat widget
+- Groq LLM API
+
+## Installation & Setup
+
+1. Clone the repository:
+
+git clone <repo-url>
+
+2. Install dependencies:
+   npm install
+
+3. Create a `.env` file with the following variables:
+
+BOT_TOKEN=telegram_bot_token
+WHATSAPP_API_KEY=whatsapp_api_key
+WHATSAPP_NUMBER_ID=whatsapp_number_id
+GROQ_API_KEY=groq_api_key
+JWT_SECRET=your_jwt_secret
+PORT=3000
+
+4. Start the server:
+
+npm start
+
+## Usage
+
+- Users can interact with the chatbot on Telegram, WhatsApp, or Web
+- Admins can log in to the Admin Panel to manage clients, users, and system prompts
+- JWT tokens handle session management for all roles
+- Logout invalidates tokens and ends sessions securely
+
+## Folder Structure
+
+/src
+/routes # API routes (auth, clients, users)
+/controllers # Business logic
+/middlewares # Auth, role-based access
+/models # MongoDB schemas
+index.js # Entry point
+.env # Environment variables
+
+## Role-Based Access & Admin Panel
+
+- **Roles:** Admin, Manager, Support Agent, User
+- **Admin:** Full access to all clients and users
+- **Manager:** Limited access to assigned clients
+- **User:** Chat access only
+- **Admin Panel Features:** Client and user management, system prompt configuration, chat log viewing, session monitoring
+
+## JWT Tokens & Session Management
+
+- JWT tokens issued on login for both users and admins
+- Tokens contain user ID, role, and expiration
+- Sessions stored in MongoDB for tracking active users
+- Logout invalidates tokens and updates session status
+- Control flows prevent access without valid tokens or roles
+
+## Security Considerations
+
+- API keys and JWT secrets stored in `.env`
+- HTTPS enforced for all webhooks and admin panel
+- Role-based access prevents unauthorized actions
+- Session expiry and token revocation implemented
+- Error handling ensures system stability and data protection
+
+## Future Expansion
+
+- Add more channels (Slack, Messenger)
+- Client-specific knowledge bases and FAQs
+- Human agent handoff when AI confidence is low
+- Advanced analytics dashboard
+- Multi-tier service packages for enterprise clients
+- Monitoring, alerts, and audit logs for compliance
+
+## Conclusion
+
+This project demonstrates a **multi-channel AI chatbot platform** with:
+
+- Groq LLM-powered intelligent responses
+- Role-based access control
+- Admin panel for managing clients and users
+- JWT-based authentication and session management
+- Secure login, logout, and control flows
+
+It forms a solid foundation for building **enterprise-ready chatbot services** with scalability and multi-client support.
