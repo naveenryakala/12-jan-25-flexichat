@@ -1,12 +1,13 @@
-// Check if user has required role(s)
 export const authorizeRoles = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
+    if (!req.user || !req.user.role) {
+      return res.status(401).json({ error: "Unauthorized" });
     }
 
     if (!allowedRoles.includes(req.user.role)) {
-      return res.status(403).json({ message: "Forbidden: Access denied" });
+      return res.status(403).json({
+        error: "Forbidden: Access denied",
+      });
     }
 
     next();

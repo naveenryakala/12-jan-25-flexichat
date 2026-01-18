@@ -1,172 +1,38 @@
 import express from "express";
 import Client from "../models/client.model.js";
-import adminAuth from "../middlewares/adminAuth.js";
+import { protect, authorizeRoles } from "../middlewares/auth.middleware.js";
+import {
+  createClient,
+  getClientProfile,
+} from "../controllers/client.controller.js";
+import {
+  clientLogin,
+  clientLogout,
+} from "../controllers/auth.controller.js";
 
 const router = express.Router();
 
-// 🔒 Protect all routes
-router.use(adminAuth);
+/* =========================
+   CLIENT AUTH (PUBLIC)
+========================= */
+router.post("/login", clientLogin);
 
-// -----------------------
-// Create client
-// -----------------------
-router.post("/", async (req, res) => {
-  try {
-    const { name, systemPrompt, channel } = req.body;
+/* =========================
+   CLIENT (LOGGED-IN)
+========================= */
+router.get("/me", protect, authorizeRoles("CLIENT"), getClientProfile);
+router.post("/logout", protect, authorizeRoles("CLIENT"), clientLogout);
 
-    if (!name) {
-      return res.status(400).json({ error: "Client name is required" });
-    }
+/* =========================
+   ADMIN ONLY
+========================= */
+router.use(protect, authorizeRoles("ADMIN"));
 
-    const client = await Client.create({
-      name,
-      systemPrompt,
-      channel,
-      isActive: true,
-      isDeleted: false,
-    });
+router.post("/", createClient);
 
-    res.status(201).json({ success: true, client });
-  } catch (error) {
-    console.error("Create client error:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// -----------------------
-// Get all clients (exclude deleted)
-// -----------------------
 router.get("/", async (req, res) => {
-  try {
-    const clients = await Client.find({ isDeleted: false });
-    res.json({ success: true, clients });
-  } catch (error) {
-    console.error("Get clients error:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// -----------------------
-// Get single client
-// -----------------------
-router.get("/:id", async (req, res) => {
-  try {
-    const client = await Client.findOne({
-      _id: req.params.id,
-      isDeleted: false,
-    });
-
-    if (!client) {
-      return res.status(404).json({ error: "Client not found" });
-    }
-
-    res.json({ success: true, client });
-  } catch (error) {
-    console.error("Get client error:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// -----------------------
-// Update client
-// -----------------------
-router.put("/:id", async (req, res) => {
-  try {
-    const client = await Client.findOneAndUpdate(
-      { _id: req.params.id, isDeleted: false },
-      req.body,
-      { new: true, runValidators: true }
-    );
-
-    if (!client) {
-      return res.status(404).json({ error: "Client not found" });
-    }
-
-    res.json({ success: true, client });
-  } catch (error) {
-    console.error("Update client error:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// -----------------------
-// Block client
-// -----------------------
-router.patch("/:id/block", async (req, res) => {
-  try {
-    const client = await Client.findOneAndUpdate(
-      { _id: req.params.id, isDeleted: false },
-      { isActive: false },
-      { new: true }
-    );
-
-    if (!client) {
-      return res.status(404).json({ error: "Client not found" });
-    }
-
-    res.json({
-      success: true,
-      message: "Client blocked successfully",
-      client,
-    });
-  } catch (error) {
-    console.error("Block client error:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// -----------------------
-// Unblock client
-// -----------------------
-router.patch("/:id/unblock", async (req, res) => {
-  try {
-    const client = await Client.findOneAndUpdate(
-      { _id: req.params.id, isDeleted: false },
-      { isActive: true },
-      { new: true }
-    );
-
-    if (!client) {
-      return res.status(404).json({ error: "Client not found" });
-    }
-
-    res.json({
-      success: true,
-      message: "Client unblocked successfully",
-      client,
-    });
-  } catch (error) {
-    console.error("Unblock client error:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-});
-
-// -----------------------
-// Soft delete client
-// -----------------------
-router.delete("/:id", async (req, res) => {
-  try {
-    const client = await Client.findOneAndUpdate(
-      { _id: req.params.id, isDeleted: false },
-      {
-        isDeleted: true,
-        deletedAt: new Date(),
-      },
-      { new: true }
-    );
-
-    if (!client) {
-      return res.status(404).json({ error: "Client not found" });
-    }
-
-    res.json({
-      success: true,
-      message: "Client deleted successfully",
-    });
-  } catch (error) {
-    console.error("Delete client error:", error);
-    res.status(500).json({ error: "Server error" });
-  }
+  const clients = await Client.find({ isDeleted: false });
+  res.json({ clients });
 });
 
 export default router;
